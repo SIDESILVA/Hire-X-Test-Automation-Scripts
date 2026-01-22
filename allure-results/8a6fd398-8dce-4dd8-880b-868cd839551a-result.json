@@ -1,0 +1,1 @@
+{"name": "TC02 - Create Order with Product and Save", "status": "skipped", "start": 1769053552569, "stop": 1769053552569, "uuid": "6d6a99e4-2388-4341-9960-ba1ea01f7153", "testCaseId": "b287b2fc0027e5283ee55bbb62a9bf33", "fullName": "tests.test_create_order#test_login_and_create_order", "titlePath": ["tests", "test_create_order.py"]}
