@@ -1,0 +1,7 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","32304","TC02 - Create Order with Product","Web Automation","2026-01-21","passed","2026-01-21","Create Order","Orders","",""
+"","23313","TC01 - Login Test for GrandRest Tenant","Web Automation","2026-01-21","passed","2026-01-21","GrandRest Tenant","Login","",""
+"","31249","TC02 - Create Order with Product","","2026-01-21","passed","2026-01-21","","","",""
+"","42370","Supplier Dashboard - Open Tasks Page","tests","2026-01-21","passed","2026-01-21","","task","",""
+"","0","TC02 - Create Order with Product and Save","","2026-01-22","skipped","2026-01-22","","","",""
+"","72177","TC02 - Create Order with Product (No Save)","Web Automation","2026-01-22","passed","2026-01-22","Create Order","Orders","",""

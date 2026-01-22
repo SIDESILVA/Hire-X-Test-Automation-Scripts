@@ -1,0 +1,3 @@
+✅ Tenant page loaded
+✅ Test finished. You can now manually close the browser.
+✅ Test finished. Browser remains open for inspection.
