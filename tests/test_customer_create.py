@@ -220,10 +220,10 @@ def test_open_new_customer_form_fill_name(driver):
         # ---------------- CLICK CREATE CUSTOMER ----------------
         with allure.step("Click Create Customer Button"):
 
-            create_button = os.wait.until(
+            create_button = wait.until(
                 EC.element_to_be_clickable((
                     By.XPATH,
-                    "//div[contains(@class,'modal-footer')]//button[@type='submit' and contains(@class,'btn-primary')]"
+                    "//div[contains(@class,'modal-footer')]//button[@type='submit' and normalize-space()='Create']"
                 ))
             )
 

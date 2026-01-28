@@ -1,0 +1,2 @@
+✅ Test finished. Browser remains open.
+✅ Test finished. Browser remains open for inspection.
