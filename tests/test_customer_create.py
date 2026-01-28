@@ -117,5 +117,123 @@ def test_open_new_customer_form_fill_name(driver):
             take_screenshot(driver, "customer_name_entered")
             print("✅ SUCCESS: First Name and Last Name entered")
 
+                # ---------------- ENTER EMAIL AND PHONE NUMBER ----------------
+        with allure.step("Enter Customer Email and Phone Number"):
+
+            # Email Address
+            email_input = wait.until(
+                EC.visibility_of_element_located((By.NAME, "emailAddress"))
+            )
+            email_input.clear()
+            email_input.send_keys("niseni@gmail.com")
+
+            # Phone Number
+            phone_input = wait.until(
+                EC.visibility_of_element_located((By.NAME, "phoneNumber"))
+            )
+            phone_input.clear()
+            phone_input.send_keys("0752569852")
+
+            take_screenshot(driver, "customer_email_phone_entered")
+            print("✅ SUCCESS: Email and Phone Number entered")
+
+                    # ---------------- ENTER CUSTOMER ADDRESS ----------------
+        with allure.step("Enter Customer Address Details"):
+
+            # Address Line 1
+            address1_input = wait.until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, "input[autocomplete='address-line1']")
+                )
+            )
+            address1_input.clear()
+            address1_input.send_keys("No.23/A, Main Rd,")
+
+            # Address Line 2
+            address2_input = wait.until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, "input[autocomplete='address-line2']")
+                )
+            )
+            address2_input.clear()
+            address2_input.send_keys("Malabe")
+
+            # Suburb
+            suburb_input = wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//label[normalize-space()='Suburb']/following::input[1]")
+                )
+            )
+            suburb_input.clear()
+            suburb_input.send_keys("Kaduwela")
+
+            take_screenshot(driver, "customer_address_entered")
+            print("✅ SUCCESS: Customer address entered")
+
+                # ---------------- SELECT CUSTOMER STATE ----------------
+        with allure.step("Select Customer State"):
+
+            # Locate the State dropdown based on the label
+            state_dropdown = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//label[normalize-space()='State']/following::select[1]")
+                )
+            )
+
+            # Scroll into view (optional but stable)
+            driver.execute_script("arguments[0].scrollIntoView(true);", state_dropdown)
+            time.sleep(0.5)
+
+            # Click to open dropdown
+            state_dropdown.click()
+            time.sleep(0.5)
+
+            # Select the option Victoria
+            victoria_option = wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//label[normalize-space()='State']/following::select[1]/option[@value='VIC']")
+                )
+            )
+            victoria_option.click()
+
+            take_screenshot(driver, "customer_state_selected")
+            print("✅ SUCCESS: Customer State selected as Victoria")
+
+        # ---------------- ENTER CUSTOMER POSTCODE ----------------
+        with allure.step("Enter Customer Postcode"):
+
+            postcode_input = wait.until(
+                EC.visibility_of_element_located(
+                    (By.CSS_SELECTOR, "input[autocomplete='postal-code']")
+                )
+            )
+
+            driver.execute_script("arguments[0].scrollIntoView(true);", postcode_input)
+            time.sleep(0.5)
+
+            postcode_input.clear()
+            postcode_input.send_keys("34/B")
+
+            take_screenshot(driver, "customer_postcode_entered")
+            print("✅ SUCCESS: Customer Postcode entered as 34/B")
+
+        # ---------------- CLICK CREATE CUSTOMER ----------------
+        with allure.step("Click Create Customer Button"):
+
+            create_button = os.wait.until(
+                EC.element_to_be_clickable((
+                    By.XPATH,
+                    "//div[contains(@class,'modal-footer')]//button[@type='submit' and contains(@class,'btn-primary')]"
+                ))
+            )
+
+            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", create_button)
+            time.sleep(0.5)
+
+            driver.execute_script("arguments[0].click();", create_button)
+
+            take_screenshot(driver, "create_customer_clicked")
+            print("✅ SUCCESS: Create button clicked")
+
     finally:
         print("✅ Test finished. Browser remains open.")

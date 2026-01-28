@@ -1,0 +1,9 @@
+✅ SUCCESS: Navigated to Customers section
+✅ SUCCESS: New Customer button clicked - Form opened
+✅ SUCCESS: First Name and Last Name entered
+✅ SUCCESS: Email and Phone Number entered
+✅ SUCCESS: Customer address entered
+✅ SUCCESS: Customer State selected as Victoria
+✅ SUCCESS: Customer Postcode entered as 34/B
+✅ Test finished. Browser remains open.
+✅ Test finished. Browser remains open for inspection.

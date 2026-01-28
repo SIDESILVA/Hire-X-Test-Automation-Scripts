@@ -1,0 +1,7 @@
+✅ SUCCESS: Navigated to Customers section
+✅ SUCCESS: New Customer button clicked - Form opened
+✅ SUCCESS: First Name and Last Name entered
+✅ SUCCESS: Email and Phone Number entered
+✅ SUCCESS: Customer address entered
+✅ Test finished. Browser remains open.
+✅ Test finished. Browser remains open for inspection.
