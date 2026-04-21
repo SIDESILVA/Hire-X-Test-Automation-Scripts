@@ -1,0 +1,10 @@
+✅ SUCCESS: Meals → Breakfast selected
+✅ SUCCESS: Product name entered as 'Croissant'
+✅ SUCCESS: Product summary entered
+✅ SUCCESS: Additional Price Information entered
+✅ SUCCESS: Base Price entered as 5
+✅ SUCCESS: Security Deposit entered as 2
+✅ SUCCESS: Product image uploaded
+✅ SUCCESS: Create button clicked
+✅ Test finished. Browser remains open.
+✅ Test finished. Browser remains open for inspection.

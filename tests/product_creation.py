@@ -105,7 +105,6 @@ def test_open_product_form_select_category(driver):
         # ---------------- CATEGORY SELECTION ----------------
         with allure.step("Select Category: Meals → Breakfast"):
 
-            # Open category dropdown
             dropdown_btn = wait.until(
                 EC.element_to_be_clickable((
                     By.XPATH,
@@ -114,7 +113,6 @@ def test_open_product_form_select_category(driver):
             )
             driver.execute_script("arguments[0].click();", dropdown_btn)
 
-            # ---------------- EXPAND MEALS (CLICK CARET) ----------------
             meals_expand_icon = wait.until(
                 EC.element_to_be_clickable((
                     By.XPATH,
@@ -123,7 +121,6 @@ def test_open_product_form_select_category(driver):
             )
             driver.execute_script("arguments[0].click();", meals_expand_icon)
 
-            # ---------------- SELECT BREAKFAST ----------------
             breakfast_option = wait.until(
                 EC.element_to_be_clickable((
                     By.XPATH,
@@ -198,15 +195,12 @@ def test_open_product_form_select_category(driver):
 
         with allure.step("Upload Product Image"):
 
-            # Absolute path of your test image
             image_path = r"C:\Users\Suchini\Desktop\Test Automation\test_images\croissant.jpg"
 
-            # Locate the hidden file input
             file_input = wait.until(
                 EC.presence_of_element_located((By.NAME, "inputFieldName"))
             )
 
-            # Upload the image
             file_input.send_keys(image_path)
 
             take_screenshot(driver, "product_image_uploaded")
@@ -229,7 +223,7 @@ def test_open_product_form_select_category(driver):
             )
 
             driver.execute_script("arguments[0].scrollIntoView(true);", create_button)
-            time.sleep(1)  # small pause for stability
+            time.sleep(1)
 
             driver.execute_script("arguments[0].click();", create_button)
 
@@ -241,6 +235,51 @@ def test_open_product_form_select_category(driver):
                 take_screenshot(driver, "product_created_redirect")
                 print("✅ SUCCESS: Redirected to product details page")
 
+        # ---------------- NEW STEP: FINALISE NOW ----------------
+        with allure.step("Click Finalise Now after product creation"):
+
+            finalise_now_link = wait.until(
+                EC.element_to_be_clickable((
+                    By.XPATH,
+                    "//a[normalize-space()='Finalise Now']"
+                ))
+            )
+
+            driver.execute_script("arguments[0].scrollIntoView(true);", finalise_now_link)
+            time.sleep(1)
+
+            driver.execute_script("arguments[0].click();", finalise_now_link)
+
+            take_screenshot(driver, "finalise_now_clicked")
+            print("✅ SUCCESS: Finalise Now clicked")
+
+        # ---------------- NEW ADDED STEP: QUANTITY ----------------
+        with allure.step("Set Quantity to 15"):
+
+            quantity_input = wait.until(
+                EC.visibility_of_element_located((
+                    By.XPATH,
+                     "//label[normalize-space()='Quantity']/following::input[1]"
+                ))
+            )
+
+            # Clear first
+            quantity_input.clear()
+            time.sleep(0.5)
+
+            driver.execute_script(
+
+            """
+            arguments[0].value = arguments[1];
+            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+            """,
+            quantity_input,
+            "15"
+        )
+
+        take_screenshot(driver, "quantity_set_15")
+        print("✅ SUCCESS: Quantity set to 15")
 
     finally:
         print("✅ Test finished. Browser remains open.")

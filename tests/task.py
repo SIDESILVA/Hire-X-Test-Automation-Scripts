@@ -9,6 +9,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
 import time
+import json
+
+ROTATION_FILE = "task_type_index.json"
 
 # -------------------- Screenshot Helper --------------------
 def take_screenshot(driver, step_name):
@@ -26,15 +29,13 @@ def take_screenshot(driver, step_name):
 @pytest.fixture
 def driver():
     chrome_options = Options()
-    chrome_options.add_experimental_option("detach", True)  # Keep browser open
+    chrome_options.add_experimental_option("detach", True)
 
-    # Automatically download & manage ChromeDriver
     driver = webdriver.Chrome(options=chrome_options)
     driver.maximize_window()
 
     yield driver
 
-    # Browser stays open because of detach=True
     print("✅ Test finished. Browser remains open for inspection.")
 
 # -------------------- Test Case --------------------
@@ -62,6 +63,10 @@ def test_open_tasks_page(driver):
         print("✅ Tenant page loaded")
 
         # ---------------- SIGN IN ----------------
+        wait.until(
+            EC.invisibility_of_element_located((By.CLASS_NAME, "spinner-wrapper"))
+        )
+
         sign_in_button = wait.until(
             EC.element_to_be_clickable((
                 By.XPATH,
@@ -120,30 +125,78 @@ def test_open_tasks_page(driver):
             take_screenshot(driver, "clicked_new_button")
             print("✅ 'NEW' button clicked successfully!")
 
-        # ---------------- SELECT TASK TYPE ----------------
-        with allure.step("Select 'Checkout Items' from Type dropdown"):
+        # ---------------- SELECT TASK TYPE (ROTATING ORDER FIXED) ----------------
+        with allure.step("Select rotating task type from dropdown"):
+
             type_dropdown = wait.until(
                 EC.element_to_be_clickable((By.NAME, "noteTypeId"))
             )
-            select = Select(type_dropdown)
-            select.select_by_visible_text("Checkout Items")
-            take_screenshot(driver, "selected_task_type")
-            print("✅ 'Checkout Items' selected in Type dropdown")
+            type_dropdown.click()
+
+            options = wait.until(
+                EC.presence_of_all_elements_located((
+                    By.XPATH,
+                    "//select[@name='noteTypeId']/option"
+                ))
+            )
+
+            types = [opt.text.strip() for opt in options if opt.text.strip()]
+            print(f"📋 Available task types: {types}")
+
+            # ---- load index ----
+            if os.path.exists(ROTATION_FILE):
+                with open(ROTATION_FILE, "r") as f:
+                    index = json.load(f).get("index", 0)
+            else:
+                index = 0
+
+            # ---- rotate sequentially ----
+            selected_type = types[index % len(types)]
+
+            # ---- save next index ----
+            with open(ROTATION_FILE, "w") as f:
+                json.dump({"index": index + 1}, f)
+
+            print(f"🎯 Selected task type: {selected_type}")
+
+            # ---- click selection ----
+            for opt in options:
+                if opt.text.strip() == selected_type:
+                    opt.click()
+                    break
+
+            take_screenshot(driver, f"selected_task_type_{selected_type}")
 
         # ---------------- SELECT RESPONSIBLE USER ----------------
-        with allure.step("Select responsible user 'Ishanka Silva'"):
+        with allure.step("Select rotating user from dropdown"):
+
             user_dropdown = wait.until(
                 EC.element_to_be_clickable((By.NAME, "user"))
             )
             user_dropdown.click()
-            ishanka_option = wait.until(
-                EC.element_to_be_clickable((
-                    By.XPATH, "//select[@name='user']/option[contains(normalize-space(.),'Ishanka')]"
+
+            options = wait.until(
+                EC.presence_of_all_elements_located((
+                    By.XPATH,
+                    "//select[@name='user']/option"
                 ))
             )
-            ishanka_option.click()
-            take_screenshot(driver, "selected_user_ishanka_silva")
-            print("✅ User 'Ishanka Silva' selected successfully!")
+
+            users = [opt.text for opt in options if opt.text.strip()]
+
+            print(f"👥 Available users: {users}")
+
+            index = int(time.time()) % len(users)
+            selected_user = users[index]
+
+            print(f"🎯 Selected user: {selected_user}")
+
+            for opt in options:
+                if opt.text.strip() == selected_user:
+                    opt.click()
+                    break
+
+            take_screenshot(driver, f"selected_user_{selected_user}")
 
         # ---------------- CLICK "CREATE" BUTTON ----------------
         with allure.step("Click 'Create' button to submit the task"):
