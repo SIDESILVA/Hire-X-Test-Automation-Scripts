@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys  # ✅ added
 import os
 import time
 
@@ -33,14 +34,12 @@ def driver():
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
 
-    # Selenium Manager will auto-download ChromeDriver
     driver = webdriver.Chrome(options=chrome_options)
     driver.maximize_window()
 
     yield driver
 
     print("✅ Test finished. Browser remains open for inspection.")
-
 
 
 # -------------------- Test Case --------------------
@@ -181,7 +180,6 @@ def test_open_product_form_select_category(driver):
             take_screenshot(driver, "base_price_entered")
             print("✅ SUCCESS: Base Price entered as 5")
 
-
         with allure.step("Enter Security Deposit"):
 
             security_deposit_input = wait.until(
@@ -235,7 +233,7 @@ def test_open_product_form_select_category(driver):
                 take_screenshot(driver, "product_created_redirect")
                 print("✅ SUCCESS: Redirected to product details page")
 
-        # ---------------- NEW STEP: FINALISE NOW ----------------
+        # ---------------- FINALISE NOW ----------------
         with allure.step("Click Finalise Now after product creation"):
 
             finalise_now_link = wait.until(
@@ -253,33 +251,122 @@ def test_open_product_form_select_category(driver):
             take_screenshot(driver, "finalise_now_clicked")
             print("✅ SUCCESS: Finalise Now clicked")
 
-        # ---------------- NEW ADDED STEP: QUANTITY ----------------
         with allure.step("Set Quantity to 15"):
 
+        # ✅ WAIT for spinner overlay to disappear (THIS is the fix)
+            wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CLASS_NAME, "spinner-wrapper")
+                )
+            )
+
             quantity_input = wait.until(
-                EC.visibility_of_element_located((
+                EC.visibility_of_element_located((By.NAME, "qty"))
+            )
+
+            # Scroll into view (extra safety)
+            driver.execute_script("arguments[0].scrollIntoView(true);", quantity_input)
+            time.sleep(0.5)
+
+            # Click using JS to avoid interception edge cases
+            driver.execute_script("arguments[0].click();", quantity_input)
+
+            # Clear properly
+            quantity_input.send_keys(Keys.CONTROL + "a")
+            quantity_input.send_keys(Keys.DELETE)
+
+            # Enter value
+            quantity_input.send_keys("15")
+
+            # Trigger Angular update
+            quantity_input.send_keys(Keys.TAB)
+
+            take_screenshot(driver, "quantity_set_15")
+            print("✅ SUCCESS: Quantity set to 15")
+
+                # ---------------- FEATURED PRODUCT ----------------
+        with allure.step("Select Featured Product checkbox"):
+
+            # Wait again in case any small loader appears
+            wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CLASS_NAME, "spinner-wrapper")
+                )
+            )
+
+            featured_checkbox = wait.until(
+                EC.element_to_be_clickable((By.NAME, "isFeatured"))
+            )
+
+            # Scroll into view
+            driver.execute_script("arguments[0].scrollIntoView(true);", featured_checkbox)
+            time.sleep(0.5)
+
+            # Click using JS (more reliable for Angular checkbox)
+            driver.execute_script("arguments[0].click();", featured_checkbox)
+
+            take_screenshot(driver, "featured_product_selected")
+            print("✅ SUCCESS: Featured product checkbox selected")
+
+                # ---------------- SAVE BUTTON ----------------
+        with allure.step("Click Save button"):
+
+            # Wait for any loader to disappear
+            wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CLASS_NAME, "spinner-wrapper")
+                )
+            )
+
+            save_button = wait.until(
+                EC.element_to_be_clickable((
                     By.XPATH,
-                     "//label[normalize-space()='Quantity']/following::input[1]"
+                    "//button[@type='submit' and normalize-space()='Save']"
                 ))
             )
 
-            # Clear first
-            quantity_input.clear()
+            # Scroll into view
+            driver.execute_script("arguments[0].scrollIntoView(true);", save_button)
             time.sleep(0.5)
 
-            driver.execute_script(
+            # Click using JS (consistent with your flow)
+            driver.execute_script("arguments[0].click();", save_button)
 
-            """
-            arguments[0].value = arguments[1];
-            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
-            arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
-            """,
-            quantity_input,
-            "15"
-        )
+            take_screenshot(driver, "save_button_clicked")
+            print("✅ SUCCESS: Save button clicked")
 
-        take_screenshot(driver, "quantity_set_15")
-        print("✅ SUCCESS: Quantity set to 15")
+        # ---------------- CLICK PRODUCTS MENU ----------------
+        with allure.step("Click Products menu"):
+
+            # Wait for page/navigation to stabilize after Save
+            wait.until(EC.url_contains("/supplier"))
+
+            # Wait for sidebar to be present
+            products_menu = wait.until(
+                EC.presence_of_element_located((
+                    By.XPATH,
+                    "//a[contains(@href,'/supplier/products')]"
+                ))
+            )
+
+            # Scroll into view
+            driver.execute_script("arguments[0].scrollIntoView(true);", products_menu)
+            time.sleep(1)
+
+            # Wait until clickable (extra safety)
+            wait.until(EC.element_to_be_clickable((
+                By.XPATH,
+                "//a[contains(@href,'/supplier/products')]"
+            )))
+
+            # Click using JS (Angular safe)
+            driver.execute_script("arguments[0].click();", products_menu)
+
+            take_screenshot(driver, "products_menu_clicked")
+            print("✅ SUCCESS: Products menu clicked")
+
+            # Confirm navigation
+            wait.until(EC.url_contains("/supplier/products"))
 
     finally:
         print("✅ Test finished. Browser remains open.")
