@@ -3,12 +3,12 @@
 import pytest
 import allure
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys  # ✅ added
+from selenium.webdriver.common.keys import Keys  
+from datetime import datetime
 import os
 import time
 
@@ -26,6 +26,33 @@ def take_screenshot(driver, step_name):
         name=step_name,
         attachment_type=allure.attachment_type.PNG
     )
+
+
+# -------------------- NEW: Image Rotation Helper --------------------
+def get_next_image(folder_path):
+    images = sorted([
+        f for f in os.listdir(folder_path)
+        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+    ])
+
+    if not images:
+        raise Exception("❌ No images found in folder!")
+
+    index_file = os.path.join(folder_path, "index.txt")
+
+    if os.path.exists(index_file):
+        with open(index_file, "r") as f:
+            index = int(f.read().strip())
+    else:
+        index = 0
+
+    image_path = os.path.join(folder_path, images[index])
+
+    index = (index + 1) % len(images)
+    with open(index_file, "w") as f:
+        f.write(str(index))
+
+    return image_path
 
 
 # -------------------- Pytest Fixture --------------------
@@ -136,11 +163,13 @@ def test_open_product_form_select_category(driver):
             product_name_input = wait.until(
                 EC.visibility_of_element_located((By.NAME, "name"))
             )
-            product_name_input.clear()
-            product_name_input.send_keys("Croissant")
 
+            unique_name = f"Test Product {datetime.now().strftime('%Y%m%d%H%M%S')}"
+            product_name_input.clear()
+            product_name_input.send_keys(unique_name)
+
+            print(f"✅ SUCCESS: Product name entered as '{unique_name}'")
             take_screenshot(driver, "product_name_entered")
-            print("✅ SUCCESS: Product name entered as 'Croissant'")
 
         with allure.step("Enter Product Summary"):
 
@@ -157,7 +186,7 @@ def test_open_product_form_select_category(driver):
 
             take_screenshot(driver, "product_summary_entered")
             print("✅ SUCCESS: Product summary entered")
-        
+
         with allure.step("Enter Additional Price Information"):
 
             price_note_input = wait.until(
@@ -191,9 +220,12 @@ def test_open_product_form_select_category(driver):
             take_screenshot(driver, "security_deposit_entered")
             print("✅ SUCCESS: Security Deposit entered as 2")
 
+        # ---------------- UPDATED IMAGE UPLOAD ----------------
         with allure.step("Upload Product Image"):
 
-            image_path = r"C:\Users\Suchini\Desktop\Test Automation\test_images\croissant.jpg"
+            folder_path = r"C:\Users\Suchini\Desktop\Ateam Software\Hire-X Automation scripts\Hire-X-Test-Automation-Scripts\Images"
+
+            image_path = get_next_image(folder_path)
 
             file_input = wait.until(
                 EC.presence_of_element_located((By.NAME, "inputFieldName"))
@@ -202,7 +234,7 @@ def test_open_product_form_select_category(driver):
             file_input.send_keys(image_path)
 
             take_screenshot(driver, "product_image_uploaded")
-            print("✅ SUCCESS: Product image uploaded")
+            print(f"✅ SUCCESS: Product image uploaded -> {image_path}")
 
         with allure.step("Wait for image upload to complete"):
             wait.until(
@@ -222,18 +254,13 @@ def test_open_product_form_select_category(driver):
 
             driver.execute_script("arguments[0].scrollIntoView(true);", create_button)
             time.sleep(1)
-
             driver.execute_script("arguments[0].click();", create_button)
 
             take_screenshot(driver, "create_button_clicked")
-            print("✅ SUCCESS: Create button clicked")
 
-            with allure.step("Wait for product creation redirect"):
-                wait.until(EC.url_contains("/supplier/products/"))
-                take_screenshot(driver, "product_created_redirect")
-                print("✅ SUCCESS: Redirected to product details page")
+            wait.until(EC.url_contains("/supplier/products/"))
+            take_screenshot(driver, "product_created_redirect")
 
-        # ---------------- FINALISE NOW ----------------
         with allure.step("Click Finalise Now after product creation"):
 
             finalise_now_link = wait.until(
@@ -243,80 +270,39 @@ def test_open_product_form_select_category(driver):
                 ))
             )
 
-            driver.execute_script("arguments[0].scrollIntoView(true);", finalise_now_link)
-            time.sleep(1)
-
             driver.execute_script("arguments[0].click();", finalise_now_link)
-
             take_screenshot(driver, "finalise_now_clicked")
-            print("✅ SUCCESS: Finalise Now clicked")
 
         with allure.step("Set Quantity to 15"):
 
-        # ✅ WAIT for spinner overlay to disappear (THIS is the fix)
-            wait.until(
-                EC.invisibility_of_element_located(
-                    (By.CLASS_NAME, "spinner-wrapper")
-                )
-            )
+            wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "spinner-wrapper")))
 
             quantity_input = wait.until(
                 EC.visibility_of_element_located((By.NAME, "qty"))
             )
 
-            # Scroll into view (extra safety)
-            driver.execute_script("arguments[0].scrollIntoView(true);", quantity_input)
-            time.sleep(0.5)
-
-            # Click using JS to avoid interception edge cases
             driver.execute_script("arguments[0].click();", quantity_input)
-
-            # Clear properly
             quantity_input.send_keys(Keys.CONTROL + "a")
             quantity_input.send_keys(Keys.DELETE)
-
-            # Enter value
             quantity_input.send_keys("15")
-
-            # Trigger Angular update
             quantity_input.send_keys(Keys.TAB)
 
             take_screenshot(driver, "quantity_set_15")
-            print("✅ SUCCESS: Quantity set to 15")
 
-                # ---------------- FEATURED PRODUCT ----------------
         with allure.step("Select Featured Product checkbox"):
 
-            # Wait again in case any small loader appears
-            wait.until(
-                EC.invisibility_of_element_located(
-                    (By.CLASS_NAME, "spinner-wrapper")
-                )
-            )
+            wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "spinner-wrapper")))
 
             featured_checkbox = wait.until(
                 EC.element_to_be_clickable((By.NAME, "isFeatured"))
             )
 
-            # Scroll into view
-            driver.execute_script("arguments[0].scrollIntoView(true);", featured_checkbox)
-            time.sleep(0.5)
-
-            # Click using JS (more reliable for Angular checkbox)
             driver.execute_script("arguments[0].click();", featured_checkbox)
-
             take_screenshot(driver, "featured_product_selected")
-            print("✅ SUCCESS: Featured product checkbox selected")
 
-                # ---------------- SAVE BUTTON ----------------
         with allure.step("Click Save button"):
 
-            # Wait for any loader to disappear
-            wait.until(
-                EC.invisibility_of_element_located(
-                    (By.CLASS_NAME, "spinner-wrapper")
-                )
-            )
+            wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "spinner-wrapper")))
 
             save_button = wait.until(
                 EC.element_to_be_clickable((
@@ -325,23 +311,13 @@ def test_open_product_form_select_category(driver):
                 ))
             )
 
-            # Scroll into view
-            driver.execute_script("arguments[0].scrollIntoView(true);", save_button)
-            time.sleep(0.5)
-
-            # Click using JS (consistent with your flow)
             driver.execute_script("arguments[0].click();", save_button)
-
             take_screenshot(driver, "save_button_clicked")
-            print("✅ SUCCESS: Save button clicked")
 
-        # ---------------- CLICK PRODUCTS MENU ----------------
         with allure.step("Click Products menu"):
 
-            # Wait for page/navigation to stabilize after Save
-            wait.until(EC.url_contains("/supplier"))
+            wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "spinner-wrapper")))
 
-            # Wait for sidebar to be present
             products_menu = wait.until(
                 EC.presence_of_element_located((
                     By.XPATH,
@@ -349,23 +325,9 @@ def test_open_product_form_select_category(driver):
                 ))
             )
 
-            # Scroll into view
-            driver.execute_script("arguments[0].scrollIntoView(true);", products_menu)
-            time.sleep(1)
-
-            # Wait until clickable (extra safety)
-            wait.until(EC.element_to_be_clickable((
-                By.XPATH,
-                "//a[contains(@href,'/supplier/products')]"
-            )))
-
-            # Click using JS (Angular safe)
             driver.execute_script("arguments[0].click();", products_menu)
-
             take_screenshot(driver, "products_menu_clicked")
-            print("✅ SUCCESS: Products menu clicked")
 
-            # Confirm navigation
             wait.until(EC.url_contains("/supplier/products"))
 
     finally:
