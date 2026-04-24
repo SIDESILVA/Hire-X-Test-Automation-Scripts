@@ -16,12 +16,13 @@ first_names = ["John", "Clara", "David", "Emma", "Michael", "Sophia", "Daniel", 
 last_names = ["Smith", "Brown", "Taylor", "Wilson", "Lee", "Walker", "Hall", "Allen"]
 
 def generate_name():
-    # clean meaningful naming: test_John_Smith
     first = random.choice(first_names)
     last = random.choice(last_names)
 
-    first_name = f"test_{first}"
+    # ONLY LETTERS — no underscore, no numbers
+    first_name = f"test{first}"
     last_name = last
+
     return first_name, last_name
 
 
