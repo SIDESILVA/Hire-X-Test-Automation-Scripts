@@ -37,7 +37,6 @@ def add_product(driver, wait, product_name, quantity):
         product_input.clear()
         product_input.send_keys(product_name)
 
-        # Wait for suggestions
         first_option = wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//typeahead-container//button[1]")
@@ -76,47 +75,64 @@ def add_product(driver, wait, product_name, quantity):
             )
         )
 
-
-# -------------------- NEW: CHANGE HIRE STATUS FUNCTION --------------------
 def change_hire_status(driver, wait):
     with allure.step("Change Hire Status (Next Status)"):
 
-        # Locate dropdown button (Hire Status)
-        status_dropdown = wait.until(
+        # 🔹 Wait for UI to stabilize after product add
+        time.sleep(2)
+
+        # 🔹 Click status dropdown button (Recieved)
+        status_btn = wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, "//div[contains(@class,'btn-group')]//button")
+                (By.XPATH, "//button[contains(@class,'dropdown-toggle') and contains(@class,'button-warning')]")
             )
         )
 
         driver.execute_script(
-            "arguments[0].scrollIntoView({block:'center'});", status_dropdown
+            "arguments[0].scrollIntoView({block:'center'});", status_btn
         )
+        driver.execute_script("arguments[0].click();", status_btn)
 
-        # Open dropdown
-        status_dropdown.click()
-
-        # Wait for dropdown options
+        # 🔹 Wait for dropdown menu
         options = wait.until(
             EC.presence_of_all_elements_located(
-                (By.XPATH, "//div[contains(@class,'dropdown-menu')]//button | //div[contains(@class,'dropdown-menu')]//a")
+                (By.XPATH, "//ul[contains(@class,'dropdown-menu') and contains(@class,'show')]//a")
             )
         )
 
         valid_options = [opt for opt in options if opt.text.strip() != ""]
 
-        if len(valid_options) < 2:
-            raise Exception("Not enough status options to change")
+        if len(valid_options) == 0:
+            raise Exception("No status options found")
 
-        next_status = valid_options[1]
-        status_name = next_status.text
+        # 🔹 Click FIRST option (Requested)
+        next_status = valid_options[0]
+        status_name = next_status.text.strip()
 
-        try:
-            next_status.click()
-        except:
-            driver.execute_script("arguments[0].click();", next_status)
+        driver.execute_script("arguments[0].click();", next_status)
 
         print(f"✅ Status changed to: {status_name}")
         take_screenshot(driver, "status_changed")
+
+# -------------------- CLOSE MODAL --------------------
+def close_order_modal(driver, wait):
+    with allure.step("Close Order Details Modal"):
+
+        close_btn = wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//button[@aria-label='Close']")
+            )
+        )
+
+        close_btn.click()
+
+        wait.until(
+            EC.invisibility_of_element_located(
+                (By.XPATH, "//div[contains(@class,'modal')]")
+            )
+        )
+
+        take_screenshot(driver, "modal_closed")
 
 
 # -------------------- TEST CASE --------------------
@@ -125,7 +141,7 @@ def change_hire_status(driver, wait):
 @allure.suite("Orders")
 @allure.sub_suite("Create Order")
 @allure.feature("Order Management")
-@allure.title("TC02 - Create Order with Product (Auto Customer Selection)")
+@allure.title("TC02 - Create Order with Product + Status Change")
 def test_login_and_create_order(driver):
 
     wait = WebDriverWait(driver, 30)
@@ -193,7 +209,7 @@ def test_login_and_create_order(driver):
             )
             take_screenshot(driver, "create_order_form")
 
-        # ---------------- SELECT CUSTOMER (AUTO) ----------------
+        # ---------------- SELECT CUSTOMER ----------------
         with allure.step("Select Random Customer"):
 
             dropdown = wait.until(
@@ -209,14 +225,8 @@ def test_login_and_create_order(driver):
 
             valid_options = [opt for opt in options if opt.text.strip() != ""]
 
-            if not valid_options:
-                raise Exception("No customers available in dropdown")
-
             selected = random.choice(valid_options)
-            customer_name = selected.text
             selected.click()
-
-            print(f"Selected Customer: {customer_name}")
 
         # ---------------- CLICK CREATE ----------------
         with allure.step("Click Create Button"):
@@ -245,11 +255,13 @@ def test_login_and_create_order(driver):
         # ---------------- ADD PRODUCT ----------------
         add_product(driver, wait, "Set", 2)
 
-        # ---------------- NEW: CHANGE STATUS ----------------
+        # ---------------- CHANGE STATUS AFTER PRODUCT ----------------
         change_hire_status(driver, wait)
 
-        take_screenshot(driver, "test_completed_without_save")
-        print("✅ Product added successfully (Auto customer used)")
+        # ---------------- CLOSE MODAL ----------------
+        close_order_modal(driver, wait)
+
+        take_screenshot(driver, "test_completed")
 
     except Exception as e:
         take_screenshot(driver, "test_failed")
