@@ -1,0 +1,9 @@
+✅ Tenant page loaded successfully!
+🛒 Found 4 visible 'View' buttons
+👉 Button text: View details
+👉 Button text: View details
+👉 Button text: View details
+👉 Button text: View details
+✅ Shuffled featured product clicked!
+🌐 Current URL: https://app-hire-x-dev-multi-tenant-angular-01-bkgee7ewapa0c5es.southeastasia-01.azurewebsites.net/products/devilled-chicken-rice-plate-00000273
+✅ Test finished. Browser remains open for inspection.
