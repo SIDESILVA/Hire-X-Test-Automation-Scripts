@@ -1,0 +1,9 @@
+✅ Tenant page loaded successfully!
+🛒 Found 4 visible 'View' buttons
+✅ Shuffled featured product clicked!
+📅 Setting End Date: 05/05/2026
+✅ End Date set successfully!
+🔢 Quantity set to 3
+✅ 'Request to Book' button clicked!
+🌐 Current URL: https://app-hire-x-dev-multi-tenant-angular-01-bkgee7ewapa0c5es.southeastasia-01.azurewebsites.net/cart
+✅ Test finished. Browser remains open for inspection.
