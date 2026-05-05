@@ -1,0 +1,8 @@
+✅ Tenant page loaded successfully!
+✅ Product clicked!
+✅ End Date set!
+🚚 Selected: Request a quote for delivery
+📌 showDeliveryAddress: True
+✅ Customer details filled
+⚠️ No address fields found
+✅ Test finished. Browser remains open for inspection.

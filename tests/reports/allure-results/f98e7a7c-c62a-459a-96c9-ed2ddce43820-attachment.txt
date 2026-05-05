@@ -1,0 +1,8 @@
+✅ Tenant page loaded successfully!
+✅ Product clicked
+🚚 Selected: Request a quote for delivery
+✅ Customer details filled
+📦 Address blocks: 2
+🌍 Country selected
+📍 State selected
+✅ Test finished. Browser remains open for inspection.

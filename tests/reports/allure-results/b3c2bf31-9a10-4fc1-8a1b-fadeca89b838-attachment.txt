@@ -1,0 +1,11 @@
+✅ Tenant page loaded successfully!
+✅ Product clicked!
+✅ End Date set!
+🚚 Selected: Local pickup from supplier
+📌 showDeliveryAddress: False
+✅ Customer details filled
+⚠️ Customer address section not found
+⚠️ Delivery address section not found
+✅ Simple address filled
+🌐 Current URL: https://app-hire-x-dev-multi-tenant-angular-01-bkgee7ewapa0c5es.southeastasia-01.azurewebsites.net/cart
+✅ Test finished. Browser remains open for inspection.

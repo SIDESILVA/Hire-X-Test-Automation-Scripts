@@ -1,0 +1,3 @@
+✅ Tenant page loaded successfully!
+✅ Product clicked
+✅ Test finished. Browser remains open for inspection.
