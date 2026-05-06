@@ -1,0 +1,14 @@
+✅ Tenant page loaded successfully!
+✅ Product clicked
+🚚 Selected: Local pickup from supplier
+✅ Customer details filled
+📦 Address blocks: 1
+🌍 Country selected
+📍 State selected
+➡️ Clicked Next button
+✅ Navigated to Order Summary
+✅ Terms & Conditions accepted
+✅ Final 'Request Booking' clicked!
+✅ Modal closed successfully!
+🌐 Current URL: https://app-hire-x-dev-multi-tenant-angular-01-bkgee7ewapa0c5es.southeastasia-01.azurewebsites.net/home
+✅ Test finished. Browser remains open for inspection.

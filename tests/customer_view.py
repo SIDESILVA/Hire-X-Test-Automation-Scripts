@@ -237,5 +237,54 @@ def test_open_tenant_and_click_featured_product(driver):
 
         print("✅ Terms & Conditions accepted")
 
+    # ---------------- FINAL REQUEST BOOKING ----------------
+    with allure.step("Click Final Request Booking"):
+
+        # Wait until button appears in summary step
+        buttons = wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, "//button[contains(.,'Request Booking')]"))
+        )
+
+        # Get ONLY visible button (important)
+        final_button = next(btn for btn in buttons if btn.is_displayed())
+
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});",
+            final_button
+        )
+
+        time.sleep(1)
+
+        driver.execute_script("arguments[0].click();", final_button)
+
+        print("✅ Final 'Request Booking' clicked!")
+
+    # ---------------- CLOSE MODAL ----------------
+    with allure.step("Close confirmation modal"):
+
+        # Wait for modal to appear
+        wait.until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "modal-footer"))
+        )
+
+        # Get all Close buttons
+        close_buttons = driver.find_elements(
+            By.XPATH, "//div[contains(@class,'modal-footer')]//button[contains(.,'Close')]"
+        )
+
+        # Pick visible one
+        close_button = next(btn for btn in close_buttons if btn.is_displayed())
+
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});",
+            close_button
+        )
+
+        time.sleep(1)
+
+        driver.execute_script("arguments[0].click();", close_button)
+
+        print("✅ Modal closed successfully!")
+
     # ---------------- FINAL ----------------
     print("🌐 Current URL:", driver.current_url)
